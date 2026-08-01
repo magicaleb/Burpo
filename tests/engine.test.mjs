@@ -1,0 +1,51 @@
+import assert from "node:assert/strict";
+import {
+  decodeWords,
+  generatePhrase,
+  getWordFamilies,
+  gridCenter,
+  normalizeTrace,
+  pointToCell,
+  routeSignature,
+  traceToRoute,
+} from "../src/trace-engine.js";
+
+const families = getWordFamilies();
+assert.equal(families.length, 9, "decoder should expose a 3×3 map");
+assert.equal(new Set(families.flatMap((family) => family.words)).size, 54, "cue words must be unique");
+
+for (let index = 0; index < 9; index += 1) {
+  const center = gridCenter(index);
+  assert.equal(pointToCell(center), index, `grid center ${index} should map back to itself`);
+}
+
+const source = [
+  { x: 100, y: 100 },
+  { x: 300, y: 100 },
+  { x: 300, y: 300 },
+  { x: 100, y: 300 },
+  { x: 100, y: 100 },
+];
+const normalized = normalizeTrace(source);
+assert.deepEqual(normalized[0], { x: 0, y: 0 });
+assert.deepEqual(normalized[2], { x: 1, y: 1 });
+
+const detailedSquare = [];
+for (let i = 0; i <= 40; i += 1) detailedSquare.push({ x: i * 5, y: 0 });
+for (let i = 1; i <= 40; i += 1) detailedSquare.push({ x: 200, y: i * 5 });
+for (let i = 1; i <= 40; i += 1) detailedSquare.push({ x: 200 - i * 5, y: 200 });
+for (let i = 1; i <= 40; i += 1) detailedSquare.push({ x: 0, y: 200 - i * 5 });
+
+const squareRoute = traceToRoute(detailedSquare);
+assert.ok(squareRoute.length >= 4 && squareRoute.length <= 7, "route should fit the audible code");
+assert.equal(squareRoute[0], 0, "square should start at top-left");
+
+const route = [0, 2, 8, 6, 4, 1];
+const generated = generatePhrase(route, 42);
+assert.deepEqual(decodeWords(generated.phrase), route, "generated language should decode losslessly");
+assert.equal(routeSignature([0, 4, 8]), "159");
+
+assert.throws(() => generatePhrase([0, 1, 2]), RangeError);
+assert.throws(() => generatePhrase([0, 1, 2, 3, 4, 5, 6, 7]), RangeError);
+
+console.log(`✓ engine tests passed (${squareRoute.length}-node square route: ${routeSignature(squareRoute)})`);

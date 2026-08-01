@@ -1,0 +1,18 @@
+{
+  "name": "Echo Trace by Burpo",
+  "short_name": "Echo Trace",
+  "description": "A private visual-memory experiment for live performance.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#101b2c",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

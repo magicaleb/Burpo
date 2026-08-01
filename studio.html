@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#101b2c">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Burpo Studio — Echo Trace</title>
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="studio-shell">
+    <header class="site-header studio-header">
+      <a class="wordmark" href="studio.html">
+        <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Burpo Studio</span>
+      </a>
+      <a class="privacy-chip studio-link" href="./">Open spectator mode ↗</a>
+    </header>
+
+    <main class="studio-main">
+      <section class="studio-hero">
+        <div>
+          <div class="eyebrow">Effect 01 · Echo Trace</div>
+          <h1>Hear the route.<br>Draw the thought.</h1>
+          <p class="lede">
+            A no-pairing drawing duplication for a borrowed phone. The participant makes a free,
+            continuous trace; a spoken interference phrase carries its essential route.
+          </p>
+        </div>
+        <aside class="effect-stack">
+          <div><span>Phone handling</span><strong>Participant only</strong></div>
+          <div><span>Connectivity</span><strong>Offline-ready</strong></div>
+          <div><span>Performer device</span><strong>Not required</strong></div>
+          <div><span>Reset</span><strong>Instant</strong></div>
+        </aside>
+      </section>
+
+      <section class="studio-section" aria-labelledby="map-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">The memory map</span>
+            <h2 id="map-title">Nine places. Nine word families.</h2>
+          </div>
+          <p>Each important turn lands in one region. Listen only for the image nouns.</p>
+        </div>
+
+        <div class="map-layout">
+          <div id="memory-map" class="memory-map" role="group" aria-label="Nine-region decoding map"></div>
+          <div class="map-notes">
+            <div class="note-card">
+              <span class="note-index">01</span>
+              <p>Picture the top row above you: <strong>weather, light, space.</strong></p>
+            </div>
+            <div class="note-card">
+              <span class="note-index">02</span>
+              <p>Picture the middle around you: <strong>plants, mind, birds.</strong></p>
+            </div>
+            <div class="note-card">
+              <span class="note-index">03</span>
+              <p>Picture the bottom below you: <strong>stone, water, fire.</strong></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="studio-section drill-section" aria-labelledby="drill-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Rehearsal deck</span>
+            <h2 id="drill-title">Decode at performance speed.</h2>
+          </div>
+          <button id="new-drill" class="button button-primary" type="button">New phrase</button>
+        </div>
+
+        <div class="drill-card">
+          <div class="drill-copy">
+            <span>Listen for the route</span>
+            <blockquote id="drill-phrase"></blockquote>
+            <button id="show-answer" class="button button-ghost" type="button">Show route</button>
+          </div>
+          <div id="drill-answer" class="drill-answer" aria-live="polite">
+            <svg id="drill-svg" viewBox="0 0 300 300" role="img" aria-label="Decoded route">
+              <g class="grid-lines">
+                <path d="M100 0V300M200 0V300M0 100H300M0 200H300"></path>
+              </g>
+              <polyline id="answer-line" points=""></polyline>
+              <g id="answer-dots"></g>
+            </svg>
+            <span id="answer-label">Answer hidden</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="studio-section" aria-labelledby="script-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Performance construction</span>
+            <h2 id="script-title">The phone creates the test, not the miracle.</h2>
+          </div>
+        </div>
+        <div class="script-grid">
+          <article>
+            <span>01 · Frame</span>
+            <h3>Visual memory, not “an app trick”</h3>
+            <p>“This is designed to interrupt visual memory. Keep the screen private; I’ll try the opposite experiment.”</p>
+          </article>
+          <article>
+            <span>02 · Listen</span>
+            <h3>Do nothing when the phrase is read</h3>
+            <p>Look away and treat the line as procedural. Build the route mentally from noun to noun.</p>
+          </article>
+          <article>
+            <span>03 · Externalize</span>
+            <h3>Commit on paper first</h3>
+            <p>Draw the route as one fluid line. Add character only after the skeleton is certain.</p>
+          </article>
+          <article>
+            <span>04 · Reveal</span>
+            <h3>Let them make the comparison</h3>
+            <p>Set your drawing down. They turn over their own phone and reveal the original themselves.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="studio-section compact-section" aria-labelledby="limits-title">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">Honest working notes</span>
+            <h2 id="limits-title">Where it is strongest.</h2>
+          </div>
+        </div>
+        <div class="limits-list">
+          <p><strong>Best material:</strong> arrows, letters, bolts, crowns, mountains, simple faces, and abstract angular lines.</p>
+          <p><strong>Avoid:</strong> tiny details, multiple disconnected shapes, handwriting, and more than seven major turns.</p>
+          <p><strong>Built-in out:</strong> reveal the overall geometry first, then call any fine detail an “impression” rather than claiming pixel accuracy.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer studio-footer">
+      <span>Burpo Studio · v0.1</span>
+      <span>Method documentation for the performer.</span>
+    </footer>
+    <script type="module" src="studio.js"></script>
+  </body>
+</html>
