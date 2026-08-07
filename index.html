@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#101b2c">
-    <meta name="description" content="A private experiment in visual memory.">
-    <title>Echo Trace — A visual memory experiment</title>
+    <meta name="description" content="A deeply questionable doodle personality test.">
+    <title>Echo Trace — Let a doodle judge you</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -19,155 +19,105 @@
         <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>Echo Trace</span>
       </a>
-      <span class="privacy-chip"><i aria-hidden="true"></i> On-device</span>
     </header>
 
     <main id="app" class="app-shell">
       <section id="stage-intro" class="stage stage-active" aria-labelledby="intro-title">
-        <div class="eyebrow">Burpo field study · 04</div>
-        <h1 id="intro-title">How clearly can you hold a line in your mind?</h1>
+        <div class="eyebrow">A highly scientific* personality test</div>
+        <h1 id="intro-title">Draw one thing.<br>Get judged.</h1>
         <p class="lede">
-          Trace one private symbol. A short verbal prompt will interrupt your visual memory,
-          then you’ll test what remains.
+          One doodle. One line. An algorithm with entirely too much confidence.
         </p>
 
-        <div class="study-card">
-          <div class="study-number">01</div>
-          <div>
-            <strong>Draw privately</strong>
-            <span>No account, camera, or microphone.</span>
-          </div>
-          <div class="study-number">02</div>
-          <div>
-            <strong>Read one line</strong>
-            <span>A brief spoken memory task.</span>
-          </div>
-          <div class="study-number">03</div>
-          <div>
-            <strong>Compare later</strong>
-            <span>Your trace remains in this tab only.</span>
-          </div>
-        </div>
-
         <button id="begin-button" class="button button-primary button-wide" type="button">
-          Begin experiment
+          Judge my doodle
           <span aria-hidden="true">↗</span>
         </button>
-        <p class="fine-print">For best results, keep the screen to yourself until asked.</p>
+        <p class="fine-print">*Not even slightly scientific. Keep your screen private.</p>
       </section>
 
       <section id="stage-draw" class="stage" aria-labelledby="draw-title" hidden>
-        <div class="stage-meta">
-          <span>Step 1 of 3</span>
-          <span>Private trace</span>
-        </div>
-        <div class="progress" aria-hidden="true"><i class="progress-one"></i></div>
-
-        <h2 id="draw-title">Draw one continuous symbol</h2>
+        <div class="eyebrow">Keep this bit to yourself</div>
+        <h2 id="draw-title">Doodle something in one line.</h2>
         <p class="stage-copy">
-          Use the whole square. Make a simple shape, letterform, or abstract line with several
-          clear changes of direction—without lifting your finger.
+          A shape, symbol, letter, or tiny masterpiece. Keep it simple and don’t lift your finger.
         </p>
 
         <div class="trace-wrap">
           <canvas id="trace-canvas" class="trace-canvas" role="img" aria-label="Private drawing area"></canvas>
           <div id="canvas-prompt" class="canvas-prompt" aria-hidden="true">
-            <span>Start anywhere</span>
+            <span>Draw here</span>
             <i></i>
           </div>
-          <span class="corner corner-tl" aria-hidden="true"></span>
-          <span class="corner corner-tr" aria-hidden="true"></span>
-          <span class="corner corner-bl" aria-hidden="true"></span>
-          <span class="corner corner-br" aria-hidden="true"></span>
         </div>
 
-        <p id="draw-feedback" class="feedback" role="status" aria-live="polite"></p>
+        <p id="draw-feedback" class="feedback feedback-error" role="status" aria-live="polite"></p>
 
         <div class="button-row">
-          <button id="clear-button" class="button button-ghost" type="button">Start over</button>
+          <button id="clear-button" class="button button-ghost" type="button">Again</button>
           <button id="seal-button" class="button button-primary" type="button" disabled>
-            Seal my trace
+            Analyze this
           </button>
         </div>
       </section>
 
       <section id="stage-phrase" class="stage" aria-labelledby="phrase-title" hidden>
-        <div class="stage-meta">
-          <span>Step 2 of 3</span>
-          <span>Verbal interference</span>
-        </div>
-        <div class="progress" aria-hidden="true"><i class="progress-two"></i></div>
-
-        <h2 id="phrase-title">Let the image go</h2>
+        <div class="eyebrow">Your completely legitimate result</div>
+        <h2 id="phrase-title">Well, this seems definitive.</h2>
         <p class="stage-copy">
-          Read the line below aloud once, at a natural pace. Don’t try to memorize it.
+          Read your result aloud. Apparently that makes it more accurate.
         </p>
 
         <div class="phrase-card">
           <div class="quote-mark" aria-hidden="true">“</div>
           <p id="memory-phrase"></p>
           <div class="phrase-rule" aria-hidden="true"></div>
-          <span>interference prompt</span>
+          <span>diagnosis confidence: wildly unjustified</span>
         </div>
 
         <button id="phrase-done-button" class="button button-primary button-wide" type="button">
-          I’ve read it aloud
+          I’ve been thoroughly analyzed
         </button>
       </section>
 
       <section id="stage-sealed" class="stage" aria-labelledby="sealed-title" hidden>
-        <div class="stage-meta">
-          <span>Step 3 of 3</span>
-          <span>Retention</span>
-        </div>
-        <div class="progress" aria-hidden="true"><i class="progress-three"></i></div>
-
         <div class="sealed-orbit" aria-hidden="true">
           <i></i><i></i><i></i>
           <span>✓</span>
         </div>
-        <h2 id="sealed-title">Memory sealed</h2>
+        <h2 id="sealed-title">Keep the doodle in mind.</h2>
         <p class="stage-copy stage-copy-centered">
-          Place your phone face down. Keep the symbol in your mind until you’re asked to compare.
+          Place your phone face down. You’ll come back to it in a moment.
         </p>
 
         <button id="compare-button" class="button button-quiet button-wide" type="button">
-          Compare when instructed
+          Reveal when asked
         </button>
       </section>
 
       <section id="stage-reveal" class="stage" aria-labelledby="reveal-title" hidden>
-        <div class="stage-meta">
-          <span>Original trace</span>
-          <span id="trace-id">Session —</span>
-        </div>
-
-        <h2 id="reveal-title">Your remembered line</h2>
-        <p class="stage-copy">Hold this beside the performer’s drawing.</p>
+        <div class="eyebrow">The original</div>
+        <h2 id="reveal-title">Your doodle.</h2>
+        <p class="stage-copy">Now compare it with the drawing on paper.</p>
 
         <div class="reveal-frame">
           <canvas id="reveal-canvas" class="reveal-canvas" role="img" aria-label="Your original drawing"></canvas>
           <span>Original · drawn on this device</span>
         </div>
 
-        <div class="result-card">
-          <span>One continuous trace</span>
-          <strong id="result-points">— turns retained</strong>
-        </div>
-
         <button id="erase-button" class="button button-danger button-wide" type="button">
-          Erase this trace
+          Erase and start over
         </button>
-        <p class="fine-print">Erasing clears the drawing from this tab. It cannot be recovered.</p>
+        <p class="fine-print">The doodle disappears when you erase it or close this tab.</p>
       </section>
     </main>
 
     <footer class="site-footer">
       <span>Echo Trace</span>
-      <span>Nothing is uploaded or stored after this tab closes.</span>
+      <span>Nothing leaves this phone.</span>
     </footer>
 
-    <noscript>This experiment requires JavaScript to process the drawing on your device.</noscript>
+    <noscript>The judgmental little algorithm needs JavaScript.</noscript>
     <script type="module" src="app.js"></script>
   </body>
 </html>

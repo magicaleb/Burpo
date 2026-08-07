@@ -1,9 +1,9 @@
 # Burpo — Echo Trace
 
-Echo Trace is a borrowed-phone drawing duplication built as a private, offline-ready web app.
-The participant draws a simple continuous symbol, completes a short verbal-interference task,
-and places their own phone face down. The performer commits to a drawing on paper before the
-participant reveals the original on their phone.
+Echo Trace is a borrowed-phone drawing duplication disguised as a tongue-in-cheek doodle
+personality test. The participant draws a simple continuous symbol, reads the algorithm's dry and
+completely unscientific verdict aloud, and places their own phone face down. The performer commits
+to a drawing on paper before the participant reveals the original on their phone.
 
 The important design choice is that the phone creates the *test*, while the impossible moment
 happens physically between the performer’s paper and the participant’s private drawing.
@@ -12,7 +12,7 @@ happens physically between the performer’s paper and the participant’s priva
 
 - `index.html` — polished participant experience
 - `studio.html` — performer training, decoder map, speed drills, and scripting
-- `src/trace-engine.js` — on-device trace analysis and phrase engine
+- `src/trace-engine.js` — corner-based trace simplification and verdict engine
 - `service-worker.js` — offline app shell after the first visit
 - `PERFORMANCE.md` — rehearsal notes and full performance sequence
 - `tests/engine.test.mjs` — dependency-free tests for the core method

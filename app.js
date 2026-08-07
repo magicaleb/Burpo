@@ -1,8 +1,6 @@
 import {
   generatePhrase,
   normalizeTrace,
-  routeComplexity,
-  routeSignature,
   traceToRoute,
 } from "./src/trace-engine.js";
 
@@ -59,7 +57,7 @@ function startDrawing(event) {
   traceCanvas.setPointerCapture(event.pointerId);
   trace = [eventPoint(event)];
   canvasPrompt.classList.add("is-hidden");
-  drawFeedback.textContent = "Keep the line continuous…";
+  drawFeedback.textContent = "";
   sealButton.disabled = true;
   drawDot(traceContext, trace[0]);
 }
@@ -77,27 +75,29 @@ function endDrawing(event) {
   if (!drawing || event.pointerId !== activePointer) return;
   drawing = false;
   activePointer = null;
-  route = traceToRoute(trace);
-
-  if (trace.length < 12 || route.length < 4) {
-    drawFeedback.textContent = "Give the line a little more shape—use more of the square and add a few clear turns.";
+  if (trace.length < 10 || traceLength(trace) < 60) {
+    drawFeedback.textContent = "Give it a little more shape first.";
     sealButton.disabled = true;
     return;
   }
 
-  drawFeedback.textContent = `${route.length} major turns detected. Keep it, or draw again.`;
+  route = traceToRoute(trace);
+  drawFeedback.textContent = "";
   sealButton.disabled = false;
 }
 
 function sealTrace() {
   route = traceToRoute(trace);
-  if (route.length < 4) return;
+  if (route.length < 2) {
+    drawFeedback.textContent = "Try a shape with at least one bend.";
+    return;
+  }
 
   sealedTrace = normalizeTrace(trace);
   const generated = generatePhrase(route);
-  document.querySelector("#memory-phrase").textContent = generated.phrase;
-  document.querySelector("#trace-id").textContent = `Session ${routeSignature(route)}`;
-  document.querySelector("#result-points").textContent = `${routeComplexity(route)} movement index`;
+  const phraseElement = document.querySelector("#memory-phrase");
+  phraseElement.textContent = generated.phrase;
+  phraseElement.dataset.length = String(route.length);
 
   traceContext.clearRect(0, 0, traceCanvas.width, traceCanvas.height);
   trace = [];
@@ -203,4 +203,12 @@ function drawNormalizedTrace(context, canvas, points) {
     context.lineTo(padding + point.x * width, padding + point.y * height);
   }
   context.stroke();
+}
+
+function traceLength(points) {
+  let total = 0;
+  for (let index = 1; index < points.length; index += 1) {
+    total += Math.hypot(points[index].x - points[index - 1].x, points[index].y - points[index - 1].y);
+  }
+  return total;
 }

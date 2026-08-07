@@ -1,4 +1,4 @@
-const CACHE_NAME = "echo-trace-v1";
+const CACHE_NAME = "echo-trace-v2";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -33,13 +33,13 @@ const WORD_FAMILIES = [
     id: "birds",
     label: "Birds",
     anchor: "Bird",
-    words: ["sparrow", "feather", "robin", "wings", "raven", "swallow"],
+    words: ["sparrow", "robin", "raven", "swallow", "magpie", "pigeon"],
   },
   {
     id: "stone",
     label: "Stone",
     anchor: "Stone",
-    words: ["pebble", "granite", "sand", "clay", "marble", "flint"],
+    words: ["pebble", "crystal", "marble", "flint", "fossil", "gemstone"],
   },
   {
     id: "water",
@@ -55,12 +55,24 @@ const WORD_FAMILIES = [
   },
 ];
 
-const TEMPLATES = {
-  4: (w) => `Where ${w[0]} meets ${w[1]}, ${w[2]} remembers ${w[3]}.`,
-  5: (w) => `Past ${w[0]}, ${w[1]} carries ${w[2]} toward ${w[3]} and ${w[4]}.`,
-  6: (w) => `${capitalize(w[0])} follows ${w[1]}; ${w[2]} turns through ${w[3]}, beneath ${w[4]}, into ${w[5]}.`,
-  7: (w) => `From ${w[0]} to ${w[1]}, ${w[2]} crosses ${w[3]}; ${w[4]} waits beside ${w[5]} and ${w[6]}.`,
-};
+const CLAUSE_BUILDERS = [
+  (word) => `blame the ${word}`,
+  (word) => `follow the ${word}`,
+  (word) => `argue with the ${word}`,
+  (word) => `apologize to the ${word}`,
+  (word) => `overthink a ${word}`,
+  (word) => `befriend a ${word}`,
+  (word) => `pocket a ${word}`,
+  (word) => `bring snacks to the ${word}`,
+  (word) => `get too close to a ${word}`,
+];
+
+const RESULT_TAGS = [
+  "It also thinks this counts as science.",
+  "Honestly, it has made worse guesses.",
+  "No refunds on the personality diagnosis.",
+  "Please do not make any major decisions based on this.",
+];
 
 export function getWordFamilies() {
   return WORD_FAMILIES.map((family) => ({ ...family, words: [...family.words] }));
@@ -124,32 +136,33 @@ export function resampleTrace(points, targetCount = 96) {
 }
 
 export function traceToRoute(points, options = {}) {
-  const minNodes = options.minNodes ?? 4;
+  const minNodes = options.minNodes ?? 2;
   const maxNodes = options.maxNodes ?? 7;
   const normalized = normalizeTrace(points);
   if (normalized.length < 2) return [];
 
-  const sampled = resampleTrace(normalized, 120);
-  let route = removeConsecutiveDuplicates(sampled.map(pointToCell));
-  route = removeStraightRuns(route);
+  const sampled = resampleTrace(normalized, 96);
+  const smoothed = smoothTrace(sampled, options.smoothingRadius ?? 2);
+  let landmarks = simplifyRdp(smoothed, options.cornerTolerance ?? 0.055);
+  landmarks = pruneShallowCorners(landmarks, options.minimumTurn ?? 0.22);
 
-  while (route.length > maxNodes) {
-    route = removeLeastInformativeTurn(route);
-  }
+  while (landmarks.length > maxNodes + 2) landmarks = removeLeastImportantLandmark(landmarks);
+
+  let route = removeConsecutiveDuplicates(landmarks.map(pointToCell));
 
   if (route.length < minNodes) {
-    const anchors = resampleTrace(normalized, minNodes * 2 + 1).map(pointToCell);
-    const expanded = removeConsecutiveDuplicates(anchors);
-    route = expanded.length > route.length ? expanded : route;
-    while (route.length > maxNodes) route = removeLeastInformativeTurn(route);
+    const anchors = removeConsecutiveDuplicates(resampleTrace(normalized, 5).map(pointToCell));
+    route = anchors.length > route.length ? anchors : route;
   }
+
+  while (route.length > maxNodes) route = removeLeastInformativeTurn(route);
 
   return route;
 }
 
 export function generatePhrase(route, seed = randomSeed()) {
-  if (route.length < 4 || route.length > 7) {
-    throw new RangeError("A phrase route must contain between 4 and 7 nodes.");
+  if (route.length < 2 || route.length > 7) {
+    throw new RangeError("A phrase route must contain between 2 and 7 nodes.");
   }
 
   const words = route.map((cell, index) => {
@@ -158,8 +171,11 @@ export function generatePhrase(route, seed = randomSeed()) {
     return family.words[positiveModulo(seed + index * 11 + cell * 7, family.words.length)];
   });
 
+  const clauses = words.map((word, index) => CLAUSE_BUILDERS[route[index]](word));
+  const tag = RESULT_TAGS[positiveModulo(seed, RESULT_TAGS.length)];
+
   return {
-    phrase: TEMPLATES[route.length](words),
+    phrase: `The algorithm thinks you'd ${joinList(clauses)}. ${tag}`,
     words,
     route: [...route],
   };
@@ -193,20 +209,69 @@ export function routeComplexity(route) {
   return Math.round(score * 10);
 }
 
-function removeStraightRuns(route) {
-  if (route.length < 3) return route;
-  const result = [route[0]];
-  for (let i = 1; i < route.length - 1; i += 1) {
-    const a = gridCoordinates(result[result.length - 1]);
-    const b = gridCoordinates(route[i]);
-    const c = gridCoordinates(route[i + 1]);
-    const ab = { x: b.x - a.x, y: b.y - a.y };
-    const bc = { x: c.x - b.x, y: c.y - b.y };
-    const sameDirection = ab.x * bc.y === ab.y * bc.x && ab.x * bc.x + ab.y * bc.y > 0;
-    if (!sameDirection) result.push(route[i]);
+function smoothTrace(points, radius) {
+  if (radius <= 0 || points.length < 3) return [...points];
+  return points.map((point, index) => {
+    if (index === 0 || index === points.length - 1) return point;
+    const start = Math.max(0, index - radius);
+    const end = Math.min(points.length - 1, index + radius);
+    const window = points.slice(start, end + 1);
+    return {
+      x: window.reduce((sum, item) => sum + item.x, 0) / window.length,
+      y: window.reduce((sum, item) => sum + item.y, 0) / window.length,
+    };
+  });
+}
+
+function simplifyRdp(points, epsilon) {
+  if (points.length <= 2) return [...points];
+  const first = points[0];
+  const last = points[points.length - 1];
+  let maxDistance = 0;
+  let splitIndex = 0;
+
+  for (let index = 1; index < points.length - 1; index += 1) {
+    const currentDistance = distanceToSegment(points[index], first, last);
+    if (currentDistance > maxDistance) {
+      maxDistance = currentDistance;
+      splitIndex = index;
+    }
   }
-  result.push(route[route.length - 1]);
-  return removeConsecutiveDuplicates(result);
+
+  if (maxDistance <= epsilon) return [first, last];
+  const left = simplifyRdp(points.slice(0, splitIndex + 1), epsilon);
+  const right = simplifyRdp(points.slice(splitIndex), epsilon);
+  return [...left.slice(0, -1), ...right];
+}
+
+function pruneShallowCorners(points, minimumTurn) {
+  if (points.length < 3) return points;
+  const result = [points[0]];
+  for (let index = 1; index < points.length - 1; index += 1) {
+    const previous = result[result.length - 1];
+    const current = points[index];
+    const next = points[index + 1];
+    const incoming = Math.atan2(current.y - previous.y, current.x - previous.x);
+    const outgoing = Math.atan2(next.y - current.y, next.x - current.x);
+    const turn = Math.abs(normalizeAngle(outgoing - incoming));
+    if (turn >= minimumTurn) result.push(current);
+  }
+  result.push(points[points.length - 1]);
+  return result;
+}
+
+function removeLeastImportantLandmark(points) {
+  if (points.length <= 2) return points;
+  let removeIndex = 1;
+  let smallestArea = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < points.length - 1; index += 1) {
+    const area = triangleArea(points[index - 1], points[index], points[index + 1]);
+    if (area < smallestArea) {
+      smallestArea = area;
+      removeIndex = index;
+    }
+  }
+  return points.filter((_, index) => index !== removeIndex);
 }
 
 function removeLeastInformativeTurn(route) {
@@ -230,8 +295,30 @@ function removeLeastInformativeTurn(route) {
   return route.filter((_, index) => index !== removeIndex);
 }
 
-function gridCoordinates(index) {
-  return { x: index % 3, y: Math.floor(index / 3) };
+function distanceToSegment(point, start, end) {
+  const lengthSquared = (end.x - start.x) ** 2 + (end.y - start.y) ** 2;
+  if (lengthSquared === 0) return distance(point, start);
+  const projection = clamp(
+    ((point.x - start.x) * (end.x - start.x) + (point.y - start.y) * (end.y - start.y)) /
+      lengthSquared,
+    0,
+    1,
+  );
+  return distance(point, {
+    x: start.x + projection * (end.x - start.x),
+    y: start.y + projection * (end.y - start.y),
+  });
+}
+
+function triangleArea(a, b, c) {
+  return Math.abs((a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) / 2);
+}
+
+function normalizeAngle(angle) {
+  let normalized = angle;
+  while (normalized > Math.PI) normalized -= Math.PI * 2;
+  while (normalized < -Math.PI) normalized += Math.PI * 2;
+  return normalized;
 }
 
 function removeConsecutiveDuplicates(items) {
@@ -261,6 +348,7 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-function capitalize(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+function joinList(items) {
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }

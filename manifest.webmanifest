@@ -1,7 +1,7 @@
 {
   "name": "Echo Trace by Burpo",
   "short_name": "Echo Trace",
-  "description": "A private visual-memory experiment for live performance.",
+  "description": "A deeply questionable doodle personality test for live performance.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
